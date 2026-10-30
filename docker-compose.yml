@@ -1,0 +1,39 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: portalweb-devcontainer
+    volumes:
+      - .:/workspace:cached
+      - frontend_node_modules:/workspace/frontend/node_modules
+      - backend_node_modules:/workspace/backend/node_modules
+    working_dir: /workspace
+    command: sleep infinity
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://portal_user:portal_pass@postgres:5432/portalweb
+      VITE_API_URL: http://localhost:3000/api
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    container_name: portalweb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portal_user
+      POSTGRES_PASSWORD: portal_pass
+      POSTGRES_DB: portalweb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  frontend_node_modules:
+  backend_node_modules:
